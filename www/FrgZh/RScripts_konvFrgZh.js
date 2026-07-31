@@ -13,7 +13,14 @@ fetch('./blattInfo.json')
     .then(data => {
         blattInfoData = data; // Assign the fetched data to the variable
         zoom = 50;
-        bildAnzeigeDSNeu();
+        // The JSON fetch can resolve before the <body> (and the imgFaksimile*
+        // elements bildAnzeigeDSNeu writes to) exist. Defer the first render
+        // until the DOM is ready.
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bildAnzeigeDSNeu);
+        } else {
+            bildAnzeigeDSNeu();
+        }
     })
     .catch(error => console.error('There was a problem with the fetch operation:', error));
 
@@ -128,65 +135,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("blaettern4").addEventListener("click", function () {
         goNextBook();
     });
-    document.getElementById("g50").addEventListener("mouseover", function () {
-        Tip('50%-Größe anzeigen');
-    });
-
-    document.getElementById("g50").addEventListener("mouseout", function () {
-        UnTip();
-    });
-
-    document.getElementById("g50").addEventListener("click", function () {
-        zoom50();
-    });
-
-    document.getElementById("g100").addEventListener("mouseover", function () {
-        Tip('100%-Größe anzeigen');
-    });
-
-    document.getElementById("g100").addEventListener("mouseout", function () {
-        UnTip();
-    });
-
-    document.getElementById("g100").addEventListener("click", function () {
-        zoom100();
-    });
-
-    document.getElementById("g150").addEventListener("mouseover", function () {
-        Tip('150%-Größe anzeigen');
-    });
-
-    document.getElementById("g150").addEventListener("mouseout", function () {
-        UnTip();
-    });
-
-    document.getElementById("g150").addEventListener("click", function () {
-        zoom150();
-    });
-
-    document.getElementById("zoomminus").addEventListener("mouseover", function () {
-        Tip('Zoom -');
-    });
-
-    document.getElementById("zoomminus").addEventListener("mouseout", function () {
-        UnTip();
-    });
-
-    document.getElementById("zoomminus").addEventListener("click", function () {
-        zoomout();
-    });
-
-    document.getElementById("zoomplus").addEventListener("mouseover", function () {
-        Tip('Zoom +');
-    });
-
-    document.getElementById("zoomplus").addEventListener("mouseout", function () {
-        UnTip();
-    });
-
-    document.getElementById("zoomplus").addEventListener("click", function () {
-        zoomin();
-    });
+    // Zoom-button bindings (g50/g100/g150/zoom±) removed: OpenSeadragon
+    // provides continuous zoom, and those buttons are no longer in the DOM.
 });
 
 // Funktion, um Tooltip anzuzeigen
@@ -215,17 +165,10 @@ function UnTip() {
     }
 }
 
-function zoomin() {
-    var GFG = document.getElementById("imgFaksimile");
-    var currWidth = GFG.clientWidth;
-    GFG.style.width = (currWidth + 100) + "px";
-}
-
-function zoomout() {
-    var GFG = document.getElementById("imgFaksimile");
-    var currWidth = GFG.clientWidth;
-    GFG.style.width = (currWidth - 100) + "px";
-}
+// Manual +/- zoom is obsolete under OpenSeadragon (continuous zoom). Kept as
+// no-ops so any lingering caller doesn't throw.
+function zoomin() {}
+function zoomout() {}
 
 
 function isOnLastSinglePage() {
@@ -286,25 +229,12 @@ function goPrevPage() {
     }
 }
 
+// The single-page view is retired (OSD shows the codicological spread only,
+// zoom === 50 always). Any residual caller is redirected to the spread so it
+// never touches the removed imgFaksimile* elements.
 function bildAnzeigeESNeu() {
-
-    const blatt = blattInfoData.blattInfo[currentSlide]; // get the blatt
-    // set all the elements in the DOM
-    document.getElementById('versAnzeige').innerHTML = blatt.konkordanz;
-    document.getElementById('schreibAnzeige').innerHTML = blatt.schreiber;
-
-    const blattAngabe = blatt.alt ? blatt.blatt + ' (alt ' + blatt.alt + ')' : blatt.blatt;
-    document.getElementById('blattAnzeige').innerHTML = "Bl. " + blattAngabe;
-    document.getElementById('lagenAnzeige').innerHTML = blatt.lagenNr + '. Lage ' + blatt.lagenName;
-    document.getElementById('schreibAnzeige').innerHTML = blatt.schreiber;
-
-    window.document.ImgLagensymbol.src = "../Lagensymbole/Einzelseite/" + blatt.lagenSymb + ".gif";
-    document.naviHSR.selectBook.selectedIndex = blatt.aktBuch;
-    document.images['imgFaksimilev'].src = "../Lagensymbole/Einzelseite/blind.gif";
-    document.images['imgFaksimiler'].src = "../Lagensymbole/Einzelseite/blind.gif";
-
-    const bildURL = zoom + "/" + blatt.img;
-    document.images['imgFaksimile'].src = bildURL;
+    resetDPSlide();
+    bildAnzeigeDSNeu();
 }
 
 function bildAnzeigeDSNeu() {
@@ -321,6 +251,8 @@ function bildAnzeigeDSNeu() {
     let lagenSym;
     let lagenText;
     let buch;
+    let bildURLv;   // verso (left) image path — resolved to IIIF by renderSpread
+    let bildURLr;   // recto (right) image path
 
     if (versoPage && rectoPage) {
         // echte Doppelseite: Verso links, Recto rechts
@@ -331,9 +263,8 @@ function bildAnzeigeDSNeu() {
         lagenText    = versoPage.lagenNr + '. Lage, ' + versoPage.dpLagenName;
         buch         = versoPage.aktBuch;
 
-        document.images['imgFaksimile'].src  = blankPage;
-        document.images['imgFaksimilev'].src = "./50/" + versoPage.img;
-        document.images['imgFaksimiler'].src = "./50/" + rectoPage.img;
+        bildURLv = "./50/" + versoPage.img;
+        bildURLr = "./50/" + rectoPage.img;
 
     } else if (rectoPage) {
         // nur Recto vorhanden → links transparent, rechts das Blatt
@@ -344,9 +275,8 @@ function bildAnzeigeDSNeu() {
         lagenText    = rectoPage.lagenNr + '. Lage, ' + rectoPage.dpLagenName;
         buch         = rectoPage.aktBuch;
 
-        document.images['imgFaksimile'].src  = blankPage;
-        document.images['imgFaksimilev'].src = blankPage;
-        document.images['imgFaksimiler'].src = "./50/" + rectoPage.img;
+        bildURLv = blankPage;
+        bildURLr = "./50/" + rectoPage.img;
 
     } else if (versoPage) {
         // nur Verso vorhanden → links das Blatt, rechts transparent
@@ -357,9 +287,8 @@ function bildAnzeigeDSNeu() {
         lagenText    = versoPage.lagenNr + '. Lage, ' + versoPage.dpLagenName;
         buch         = versoPage.aktBuch;
 
-        document.images['imgFaksimile'].src  = blankPage;
-        document.images['imgFaksimilev'].src = "./50/" + versoPage.img;
-        document.images['imgFaksimiler'].src = blankPage;
+        bildURLv = "./50/" + versoPage.img;
+        bildURLr = blankPage;
     }
 
     document.getElementById('blattAnzeige').innerHTML  = seitenAngabe;
@@ -368,25 +297,19 @@ function bildAnzeigeDSNeu() {
     document.getElementById('lagenAnzeige').innerHTML  = lagenText;
     window.document.ImgLagensymbol.src                 = lagenSym;
     document.naviHSR.selectBook.selectedIndex          = buch;
+
+    // IIIF/OpenSeadragon: hand the verso/recto image paths to the shared OSD
+    // wrapper, which resolves them to UB Bern info.json tile sources and
+    // stitches the spread (verso left, recto right).
+    renderSpread('osdSpread', bildURLv, bildURLr);
 }
 
-function zoom150() {
-    zoom = 150;
-    bildAnzeigeESNeu();
-    enableManualZoom();
-}
-
-function zoom100() {
-    zoom = 100;
-    bildAnzeigeESNeu();
-    disableManualZoom();
-}
-
-function zoom50() {
-    zoom = 50;
-    bildAnzeigeDSNeu();
-    disableManualZoom();
-}
+// Zoom is now continuous in OpenSeadragon; the old 50/100/150 modes all map
+// to the single stitched spread. (Buttons are hidden via CSS; these remain
+// only because the DOMContentLoaded handler still binds click listeners.)
+function zoom150() { zoom = 50; bildAnzeigeDSNeu(); }
+function zoom100() { zoom = 50; bildAnzeigeDSNeu(); }
+function zoom50()  { zoom = 50; bildAnzeigeDSNeu(); }
 
 function disableManualZoom() {
     window.document.getElementById('zoomminus').style.visibility = 'hidden';

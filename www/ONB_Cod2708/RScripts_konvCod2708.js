@@ -202,65 +202,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	document.getElementById("blaettern4").addEventListener("click", function () {
 		goNextBook();
 	});
-	document.getElementById("g50").addEventListener("mouseover", function () {
-		Tip('50%-Größe anzeigen');
-	});
-
-	document.getElementById("g50").addEventListener("mouseout", function () {
-		UnTip();
-	});
-
-	document.getElementById("g50").addEventListener("click", function () {
-		zoom50();
-	});
-
-	document.getElementById("g100").addEventListener("mouseover", function () {
-		Tip('100%-Größe anzeigen');
-	});
-
-	document.getElementById("g100").addEventListener("mouseout", function () {
-		UnTip();
-	});
-
-	document.getElementById("g100").addEventListener("click", function () {
-		zoom100();
-	});
-
-	document.getElementById("g150").addEventListener("mouseover", function () {
-		Tip('150%-Größe anzeigen');
-	});
-
-	document.getElementById("g150").addEventListener("mouseout", function () {
-		UnTip();
-	});
-
-	document.getElementById("g150").addEventListener("click", function () {
-		zoom150();
-	});
-
-	document.getElementById("zoomminus").addEventListener("mouseover", function () {
-		Tip('Zoom -');
-	});
-
-	document.getElementById("zoomminus").addEventListener("mouseout", function () {
-		UnTip();
-	});
-
-	document.getElementById("zoomminus").addEventListener("click", function () {
-		zoomout();
-	});
-
-	document.getElementById("zoomplus").addEventListener("mouseover", function () {
-		Tip('Zoom +');
-	});
-
-	document.getElementById("zoomplus").addEventListener("mouseout", function () {
-		UnTip();
-	});
-
-	document.getElementById("zoomplus").addEventListener("click", function () {
-		zoomin();
-	});
+	// Zoom-button bindings (g50/g100/g150/zoom±) removed: OpenSeadragon
+	// provides continuous zoom, and those buttons are no longer in the DOM.
 });
 
 // Funktion, um Tooltip anzuzeigen
@@ -1219,7 +1162,16 @@ function bildAnzeigeDS() {
 	window.document.getElementById('zoomplus').style.visibility = 'hidden';
 	window.document.getElementById('zoomplusHell').style.visibility = 'visible';
 
-	window.defaultStatus = "Berner Parzival-Handschrift, " + seitenAngabe + "  |  Bildgr" + oesz + "e: " + zoom + "%"; return true;
+	window.defaultStatus = "Berner Parzival-Handschrift, " + seitenAngabe + "  |  Bildgr" + oesz + "e: " + zoom + "%";
+
+	// IIIF/OpenSeadragon: bildURLv/bildURLr are "50/T{NNN}{r|v}.jpg" (or
+	// transparent.png). Hand them to the shared OSD wrapper, which strips the
+	// path to a stem, looks it up in blattInfoIIIF_T (UB Bern info.json URLs)
+	// and stitches the spread.
+	if (typeof renderSpread === 'function') {
+		renderSpread('osdSpread', bildURLv, bildURLr);
+	}
+	return true;
 }
 
 
