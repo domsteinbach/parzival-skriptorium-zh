@@ -7,18 +7,17 @@
 
 	<title>Zürcher Parzival-Skriptorium</title>
 	<link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+	<script src="https://cdn.jsdelivr.net/npm/openseadragon@4/build/openseadragon/openseadragon.min.js"></script>
 	<script src="RScripts_konvCgm63.js" type="text/javascript"></script>
 	<script src="blattInfoDSCgm63.js" type="text/javascript"></script>
 	<script src="blattInfoCgm63.js" type="text/javascript"></script>
+	<script src="../osdViewer.js" type="text/javascript"></script>
 
 	<link rel="stylesheet" type="text/css" href="css/RStylesCgm63.css">
-
-
 </head>
 
 
 <body bgcolor="F0F0F0">
-	<!--<script src="wz_tooltip.js" type="text/javascript"></script>-->
 	<div class="header-container">
 		<div id="startseite-icon-button">
 			<a href="../index.html" aria-label="Zur Startseite">
@@ -35,62 +34,59 @@
 	</div>
 	<div id="navigation">
 		<form name="naviHSR">
-			<div id="dropdown"> <!-- In css via display: none; ausgeblendet!-->
-				<select name="selectBook" id="buchMenu" class="Auswahl">
-					<option value="javascript:">Buch w&auml;hlen</option>
-					<!--<option value="r1">Buch I</option>
-					<option value="r12">Buch II</option>
-					<option value="v23">Buch III</option>
-					<option value="r36">Buch IV</option>
-					<option value="r45">Buch V</option>
-					<option value="r56">Buch VI</option>
-					<option value="r67">Buch VII</option>
-					<option value="r79">Buch VIII</option>
-					<option value="r86">Buch IX</option>
-					<option value="r100">Buch X</option>
-					<option value="r110">Buch XI</option>-->
-				</select>
+			<div class="hdr-book">
+				<div id="dropdown">
+					<select name="selectBook" id="buchMenu" class="Auswahl">
+						<option value="javascript:">Buch w&auml;hlen</option>
+					</select>
+				</div>
+				<div id="versAnzeige" class="dynamisch"></div>
 			</div>
 
-
-
-			<div class="navText" id="lbl_blatt">Blatt</div>
-			<div id="blatt">
-				<input type="text" name="Blatt" maxlength="6" class="Feld" id="blattInput" />
-			</div>
-			<div id="submitBlatt">
-				<img border="0" src="../images/submitSuchen.gif" alt="Blatt finden" id="submitBlattImg" />
+			<div class="hdr-arrows">
+				<div id="blaettern1"><img border="0" src="../images/backward_book.gif"></div>
+				<div id="blaettern2"><img border="0" src="../images/backward_page.gif"></div>
+				<div id="blaettern3"><img border="0" src="../images/forward_page.gif"></div>
+				<div id="blaettern4"><img border="0" src="../images/forward_book.gif"></div>
 			</div>
 
-
-			<div class="navText" id="lbl_vers">Vers</div>
-			<div id="vers">
-				<input type="text" name="Vers" maxlength="6" class="Feld" id="versInput" />
+			<div class="hdr-blatt">
+				<div class="hdr-blatt-input">
+					<div class="navText" id="lbl_blatt">Blatt</div>
+					<div id="blatt">
+						<input type="text" name="Blatt" maxlength="6" class="Feld" id="blattInput" />
+					</div>
+					<div id="submitBlatt">
+						<img border="0" src="../images/submitSuchen.gif" alt="Blatt finden" id="submitBlattImg" />
+					</div>
+				</div>
+				<div id="blattAnzeige" class="dynamisch"></div>
 			</div>
-			<div id="submitVers">
-				<img border="0" src="../images/submitSuchen.gif" alt="Vers finden" id="submitVersImg" />
+
+			<div class="hdr-vers">
+				<div class="hdr-vers-input">
+					<div class="navText" id="lbl_vers">Vers</div>
+					<div id="vers">
+						<input type="text" name="Vers" maxlength="6" class="Feld" id="versInput" />
+					</div>
+					<div id="submitVers">
+						<img border="0" src="../images/submitSuchen.gif" alt="Vers finden" id="submitVersImg" />
+					</div>
+				</div>
+				<div id="schreibAnzeige" class="dynamisch"></div>
 			</div>
 
-
-
-			<!--Abschnitt "Verweise wählen"-->
-			<!--
-				<div id="verweise" onmouseover="Tip('Verweise wählen')" onmouseout="UnTip()">
-				<select name="selectVerweise" id="verweiseMenu" onChange="MM_jumpVerweise()" class="Auswahl">
-					<option value="javascript:">Irgendetwas w&auml;hlen</option>
-					<option value="v2">Bl. 2v</option>
-					<option value="r6">Bl. 3r</option>
-				</select>
+			<div class="hdr-lage">
+				<div id="lagensymbol"><img name="ImgLagensymbol" src="../Lagensymbole/Doppelseite/blind.gif"
+						alt="Lagensymbol" /></div>
+				<div id="lagenAnzeige" class="dynamisch"></div>
 			</div>
-			-->
 
 			<div id="handschrift">
 				<select name="selectHand" id="handMenu" class="Auswahl">
 					<option value="javascript:">Handschriften Z&uuml;rcher Skriptorium</option>
 					<option value="../ONB_Cod2708/cod2708.html">Parzival-Handschrift Wien, &Ouml;sterreichische
 						Nationalbibliothek, Cod. 2708 (Hs. T)</option>
-					<!--option value="../../cod2775/Daten/cod2775.html">Parzival-Hs.U: Wien, &Ouml;sterreichische
-						Nationalbibliothek, Cod. 2775</option-->
 					<option value="../FrgZh/frgzhtrpz.html">Fragmente Z&uuml;rich: Tristan (z/z<sup>1</sup>) und
 						Parzival (32): Staatsarchiv, C VI/1 Mappe VI fol. 30&ndash;37; Zentralbibliothek, Cod. Car. C
 						182</option>
@@ -99,54 +95,26 @@
 				</select>
 			</div>
 		</form>
-
-		<div id="blaettern1"><img border="0" src="../images/backward_book.gif"></div>
-		<div id="blaettern2"><img border="0" src="../images/backward_page.gif"></div>
-		<div id="blaettern3"><img border="0" src="../images/forward_page.gif"></div>
-		<div id="blaettern4"><img border="0" src="../images/forward_book.gif"></div>
-
-		<!-- Navigation 2. Zeile -->
-		
-		<div id="versAnzeige" class="dynamisch"></div>
-		<div id="schreibAnzeige" class="dynamisch"></div>
-		<div id="blattAnzeige" class="dynamisch"></div>
-		<div id="lagenAnzeige" class="dynamisch"></div>
-		<div id="lagensymbol"><img name="ImgLagensymbol" src="../images/Lagensymbole/blind.gif" alt="Lagensymbol" />
-		</div>
-		<div id="g50" class="dynamisch"><img src="../images/g50.gif" alt="Größe 50%" id="zoom50Img" /></div>
-		<div id="g100" class="dynamisch"><img src="../images/g100.gif" alt="Größe 100%" id="zoom100Img" /></div>
-		<div id="g150" class="dynamisch"><img src="../images/g150.gif" alt="Größe 150%" id="zoom150Img" /></div>
-		<div id="zoomminus" class="dynamisch"><img name="ImgZoomminus" src="../images/zoomminus.gif" border="0"
-				alt="Zoom minus" /></div>
-		<div id="zoomplus" class="dynamisch"><img name="ImgZoomplus" src="../images/zoomplus.gif" border="0"
-				alt="Zoom plus" /></div>
-		<div id="zoomminusHell" class="dynamisch"><img name="ImgZoomminusHell" src="../images/zoom_hell.gif"
-				border="0" /></div>
-		<div id="zoomplusHell" class="dynamisch"><img name="ImgZoomplusHell" src="../images/zoom_hell.gif" border="0" />
-		</div>
-		<div id="miniaturansicht" class="dynamisch">
-			<!--<img name="ImgMiniaturansicht" src="../images/miniaturansicht.gif" border="0" alt="Miniaturansicht" />-->
-		</div>
-		<div id="miniaturansichtHell" class="dynamisch">
-			<!--<img name="ImgMiniaturansichtHell" src="../images/miniaturansicht_hell.gif" border="0" />-->
-		</div>
-		<div id="bildbeschreibung" class="dynamisch">
-			<!--<img name="ImgBildbeschreibung" src="../images/bildbeschreibung.gif" border="0" alt="Bildbeschreibung" />-->
-		</div>
-		<div id="bildbeschreibungHell" class="dynamisch">
-			<!--<img name="ImgBildbeschreibungHell" src="../images/bildbeschreibung_hell.gif" border="0" />-->
-		</div>
 	</div>
-	<div id="container">
-		<img src="#" id="imgFaksimile" alt="Digitalfaksimile" name="imgFaksimile" />
-	</div>
-	<div id="flexcontainer">
-		<div id="containerv">
-			<img src="#" id="imgFaksimilev" alt="Digitalfaksimile" name="imgFaksimilev" />
-		</div>
-		<div id="containerr">
-			<img src="#" id="imgFaksimiler" alt="Digitalfaksimile" name="imgFaksimiler" />
-		</div>
+
+	<div id="osdSpread"></div>
+
+	<!-- Elements the legacy RScripts_konvCgm63.js still reads/writes (image
+	     placeholders it assigns .src to, and the miniatur/description/zoom
+	     toggles whose .style.visibility it flips). Kept out of view; the
+	     actual page display comes from renderSpread('osdSpread', …). -->
+	<div style="display:none">
+		<img src="#" id="imgFaksimile" name="imgFaksimile" />
+		<img src="#" id="imgFaksimilev" name="imgFaksimilev" />
+		<img src="#" id="imgFaksimiler" name="imgFaksimiler" />
+		<div id="miniaturansicht"></div>
+		<div id="miniaturansichtHell"></div>
+		<div id="bildbeschreibung"></div>
+		<div id="bildbeschreibungHell"></div>
+		<div id="zoomminus"></div>
+		<div id="zoomminusHell"></div>
+		<div id="zoomplus"></div>
+		<div id="zoomplusHell"></div>
 	</div>
 </body>
 

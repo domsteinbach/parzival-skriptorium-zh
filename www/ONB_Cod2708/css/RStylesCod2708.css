@@ -1,136 +1,175 @@
 @charset "utf-8";
-/* CSS Document */
 
-/* allgemeine Formatierungen */
-body	    { background-color:#F0F0F0;}
-p	    		{ margin-top:5px; margin-bottom:15px; }
-h1 				{ font-family:Arial, Helvetica, sans-serif; font-size: 14px; font-weight: bold; margin-top:50px; }
-h2				{ font-family:Arial, Helvetica, sans-serif; font-size: 13px; font-weight: normal; padding-top:5px; padding-left:15px }
-a:link 		{ color:#000000; font-weight:bold; text-decoration:none; }
-a:visited	{ color:#000000; font-weight:bold; text-decoration:none; }
-a:hover		{ color:#8B1B31; font-weight:bold; text-decoration:none; }
-a:active	{ color:#000000; font-weight:bold; text-decoration:none; }
-a:focus		{ color:#000000; font-weight:bold; text-decoration:none; }
+/* Ported from the wellcome-schreiber viewer template: a flex-column page
+   (header rows fixed, #osdSpread fills the rest) replacing the legacy
+   absolute-positioned layout. Zoom buttons are gone (OSD zooms continuously). */
 
-/* Positionierung Navigation */
-#bezeichnung    {  z-index:1; }
-#start 			{ position:absolute; top:39px; left:20px; z-index:1; }
-#dropdown 		{ position:absolute; top:39px; left:10px; z-index:1; }
-#blaettern1 	{ position:absolute; top:42px; left:235px; width:32px; height:20px; z-index:1; }
-#blaettern2 	{ position:absolute; top:42px; left:265px; width:32px; height:20px; z-index:1; }
-#blaettern3 	{ position:absolute; top:42px; left:303px; width:32px; height:20px; z-index:1; }
-#blaettern4 	{ position:absolute; top:42px; left:330px; width:32px; height:20px; z-index:1; }
-#versInput     {width:32pt;}
-#lbl_vers 		{ position:absolute; top:41px; left:382px; z-index:1; }
-#vers 			{ position:absolute; top:39px; left:414px; z-index:1; font-family:Arial, Helvetica, sans-serif; font-size:10px }
-#submitVers 	{ position:absolute; top:40px; left:469px;	z-index:2; }
-#lbl_blatt 		{ position:absolute; top:41px; left:507px; z-index:1; }
-#blatt 			{ position:absolute; top:39px; left:539px; z-index:1; }
-#blattInput     {width:32pt;}
-#submitBlatt 	{ position:absolute; top:40px; left:594px;	z-index:1; }
-#lagensymbol 	{ position:absolute; top:20px; left:640px; z-index:1; }
-#handschrift 	{ position:absolute; top:38px; left:827px; z-index:1; width:10px; min-width:10px;}
-#handMenu       {width:230px;}
+/* ---------------------- reset + page frame ---------------------- */
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
 
-/* 2. Zeile Navigation */
-
-#versAnzeige 	{ position:absolute; top:70px; left:10px; width:auto; height:20px; z-index:1; }
-#schreibAnzeige { position:absolute; top:70px; left:250px; width:auto; height:20px; z-index:1; }
-#verweise 		{ position:absolute; top:70px; left:365px; z-index:1; }
-#blattAnzeige 	{ position:absolute; top:70px; left:507px; width:auto; height:20px; z-index:1; }
-#lagenAnzeige 	{ position:absolute; top:70px; left:640px; width:auto; height:20px; z-index:1; }
-#g50 			{ position:absolute; top:70px; left:827px; width:auto; height:20px; z-index:1; }
-#g100 			{ position:absolute; top:70px; left:880px; width:auto; height:20px; z-index:1; }
-#g150 			{ position:absolute; top:70px; left:933px; width:auto; height:20px; z-index:1; }
-#zoomminus 			    { position:absolute; top:70px; left:983px; z-index:1; }
-#zoomminusHell 			{ position:absolute; top:70px; left:983px; z-index:1; }
-#zoomplus 			    { position:absolute; top:70px; left:1013px; z-index:1; }
-#zoomplusHell 			{ position:absolute; top:70px; left:1013px; z-index:1; }
-#miniaturansicht 		{ position:absolute; top:70px; left:1043px; visibility:hidden; z-index:5; }
-#miniaturansicht50 		{ position:absolute; top:70px; left:1043px; visibility:hidden; z-index:5; }
-#miniaturansichtHell 	{ position:absolute; top:70px; left:1043px; z-index:1; }
-#bildbeschreibung 		{ position:absolute; top:70px; left:1073px; visibility:hidden; z-index:5; }
-#bildbeschreibung50 	{ position:absolute; top:70px; left:1073px; visibility:hidden; z-index:5; }
-#bildbeschreibungHell 	{ position:absolute; top:70px; left:1073px; z-index:1; }
-#navigation 	{ height: 78px; }
-#myContainer	{ margin-left: -10px; }
-
-.tooltip {
-    position: absolute;
-    z-index: 9999; /* Stellen Sie sicher, dass der Tooltip über anderen Elementen liegt */
-    background-color: #EEE4C6;
-    color: 000000;
-    padding: 3px;
-    font-family:Arial, Helvetica, sans-serif; font-size: 12px; font-weight: normal;
-    border: black solid 1px;
-    pointer-events: none; /* Dadurch wird sichergestellt, dass der Tooltip keine Mausereignisse abfängt */
-}
-
-#flexcontainer {
-    position:absolute;
-    top:100px; 
-    left:10px;
-    font-size: 0;
-    white-space: nowrap;
-}
-
-#containerv, #containerr {
+html, body {
+    margin: 0;
+    padding: 0.4em;
+    height: 100vh;
     overflow: hidden;
-    margin: 0; 
-    padding: 0; 
-    display: inline-block; 
-    vertical-align: top; 
+    background-color: #F0F0F0;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-#containerv img, #containerr img {
-    max-width: 100%; 
-    height: auto; 
-}
+p  { margin-top: 5px; margin-bottom: 15px; }
+h1 { font-size: 14px; font-weight: bold; margin-top: 50px; }
+h2 { font-size: 13px; font-weight: normal; padding-top: 5px; padding-left: 15px; }
+a:link, a:visited, a:active, a:focus { color: #000000; font-weight: bold; text-decoration: none; }
+a:hover  { color: #8B1B31; font-weight: bold; text-decoration: none; }
 
-
-#container 		{ position:absolute; top:100px; left:10px; width:auto; height:auto; z-index:1; }
-/*
-#containerv 	{ position:absolute; top:100px; left:10px; width:auto; height:auto; z-index:1; }
-#containerr 	{ position:absolute; top:100px; left:460px; width:auto; height:auto; z-index:1; }
-*/
-
-/* Formatierung Navigationstext */
-.navText	    { font-family:Arial, Helvetica, sans-serif; font-size:10pt; text-decoration: none; margin-top:0px; margin-bottom:0px; }
-.navTextLink	{ font-family:Arial, Helvetica, sans-serif; font-size:10pt; text-decoration: none; margin-top:0px; margin-bottom:0px; }
-.red					{color:#8B1B31}
-
-.dynamisch		{ font-family:Arial, Helvetica, sans-serif; font-size:10pt; }
-/*.titel				{ font-family:Arial, Helvetica, sans-serif; font-size:12pt; font-weight: bold; color:#9E2922; }*/
-.titel				{ font-family:Arial, Helvetica, sans-serif; font-size:12pt; color:#8B1B31; }
-.fliesstext		{ font-family:Arial, Helvetica, sans-serif; font-size:10pt; margin-bottom:10px; margin-right:20px;  padding-left:15px}
-
+/* ---------------------- header row 1: home + title ---------------------- */
 .header-container {
     display: flex;
     flex-direction: row;
     align-items: center;
-  }
-  
-  #startseite-icon-button {
+    gap: 0.5em;
+    flex: 0 0 auto;
+    margin-top: 0.5em;
+    margin-bottom: 0.75em;
+}
+
+#startseite-icon-button {
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    margin-right: 8px;
-    padding: 1pt;
+    padding: 0.15em;
     border: 1pt solid #8B1B31;
-    border-radius: 6pt;
-    width: 12pt; 
-    height: 12pt;
+    border-radius: 0.4em;
+    width: 1.5em;
+    height: 1.5em;
     transition: background-color 0.2s ease;
-    box-shadow: 2pt 2pt 4pt rgba(0, 0, 0, 0.2);
-  }
-  
-  #startseite-icon-button:hover {
-    background-color: #f5e9eb;
-  }
-  
-  .icon {
-    width: 12pt;
-    height: 12pt;
-    color: #8B1B31;
-  }
+    box-shadow: 0.15em 0.15em 0.3em rgba(0, 0, 0, 0.2);
+    flex: 0 0 auto;
+}
+#startseite-icon-button:hover { background-color: #f5e9eb; }
+.icon { width: 1em; height: 1em; color: #8B1B31; }
+
+#bezeichnung { z-index: 1; }
+
+/* ---------------------- header row 2: navigation ----------------------
+   Single flex row of groups (left-to-right):
+     .hdr-book    — buchMenu (top) / versAnzeige (bottom)
+     .hdr-arrows  — the 4 blaettern arrows in one inline row
+     .hdr-blatt   — Blatt label + input + submit (top) / blattAnzeige (bottom)
+     .hdr-vers    — Vers label + input + submit (optional, ONB/BSB)
+     .hdr-lage    — lagensymbol (top, larger) / lagenAnzeige (bottom)
+     #handschrift — manuscript switcher
+*/
+#navigation {
+    flex: 0 0 auto;
+    margin-bottom: 0.75em;
+}
+
+form[name="naviHSR"] {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 1.5em;
+    margin: 0;
+}
+
+.hdr-book, .hdr-blatt, .hdr-vers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.25em;
+}
+
+.hdr-lage {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25em;
+}
+
+.hdr-arrows {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5em;
+}
+
+.hdr-blatt-input, .hdr-vers-input {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5em;
+}
+
+#dropdown, #blatt, #submitBlatt, #vers, #submitVers, #handschrift { display: inline-flex; align-items: flex-start; }
+#lbl_blatt, #lbl_vers { display: inline-block; }
+#blattInput, #versInput { width: 4em; }
+/* Fixed, wider width so long option labels are clipped (ellipsis) in the
+   closed select instead of stretching or overflowing the header. */
+#handMenu    { width: 22em; max-width: 22em; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+/* Match select's internal text-left padding so versAnzeige lines up
+   with the option text visible in #buchMenu. */
+#versAnzeige { padding-left: 0.5em; }
+
+#blaettern1, #blaettern2, #blaettern3, #blaettern4 {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+#blaettern1 img, #blaettern2 img, #blaettern3 img, #blaettern4 img { display: block; }
+
+#versAnzeige, #blattAnzeige, #lagenAnzeige, #schreibAnzeige {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    white-space: nowrap;
+}
+
+#lagensymbol {
+    display: block;
+    width: 128px;
+    height: 39px;
+}
+#lagensymbol img {
+    display: block;
+    width: 128px;
+    height: 39px;
+}
+
+/* ---------------------- OSD stage ---------------------- */
+#osdSpread {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: #F0F0F0;
+}
+#osdSpread .openseadragon-canvas,
+#osdSpread canvas { cursor: grab; }
+#osdSpread .openseadragon-canvas:active,
+#osdSpread canvas:active { cursor: grabbing; }
+
+/* ---------------------- tooltips ---------------------- */
+.tooltip {
+    position: absolute;
+    z-index: 9999;
+    background-color: #EEE4C6;
+    color: #000000;
+    padding: 3px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    border: black solid 1px;
+    pointer-events: none;
+}
+
+/* ---------------------- text helpers ---------------------- */
+.navText, .navTextLink { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; text-decoration: none; margin: 0; }
+.red        { color: #8B1B31; }
+.dynamisch  { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; }
+.titel      { font-family: Arial, Helvetica, sans-serif; font-size: 12pt; color: #8B1B31; }
+.fliesstext { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; margin-bottom: 10px; margin-right: 20px; padding-left: 15px; }
