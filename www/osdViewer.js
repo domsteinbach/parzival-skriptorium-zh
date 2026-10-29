@@ -1,8 +1,8 @@
 // IIIF + OpenSeadragon viewer wrapper for the Parzival-Skriptorium manuscripts.
 //
-// Ported from the sibling wellcome-schreiber repo, trimmed for parzival
-// (no per-manuscript crop/scale tables) and extended so one wrapper serves
-// all three viewers:
+// Ported from the sibling wellcome-schreiber repo (crop table and
+// height-normalized spread layout included; no per-manuscript scale table)
+// and extended so one wrapper serves all viewers:
 //
 // Contract:
 //   window.renderSpread(containerId, leftInput, rightInput)
@@ -18,11 +18,14 @@
 //       (c) a blank sentinel (transparent.png / blind.gif / #) — that side
 //           renders empty.
 //     Mapping VALUES may themselves be a bare GUID (built into a UB Bern v3
-//     info.json URL) or an absolute ".../info.json" URL (used as-is — how the
-//     ONB mapping works).
+//     info.json URL), an absolute ".../info.json" URL (used as-is — how the
+//     ONB mapping works), or a relative path to a local .jpg/.png (shown as a
+//     single static image — how the WhFrg77 PDF scans work).
 //
 //   Both folios are stitched into ONE OpenSeadragon instance (verso left,
-//   recto right, small gap), sharing one zoom/pan canvas. Missing/blank sides
+//   recto right, small gap), sharing one zoom/pan canvas, each cropped by
+//   GUID_CROP_PCT and scaled so their visible areas share top and bottom
+//   edges. Missing/blank sides
 //   render empty; per-side errors are surfaced without breaking the other.
 //   Idempotent: each call tears down the previous viewer.
 //
@@ -34,6 +37,26 @@
   // Between-folio gap, in OSD viewport units.
   var SPREAD_GAP = 0.02;
   var activeViewer = null;
+  // Incremented per renderSpread call; an older call whose info.json fetch
+  // resolves late is dropped instead of replacing the newer spread.
+  var renderSeq = 0;
+
+  // Per-image crop overrides for scans with photographic artifacts
+  // (black shooting-stand borders, colour cards, mounts) that shouldn't be
+  // visible in the reading view. Keyed by IIIF image identifier (the UB
+  // Bern GUID, i.e. the path segment before /info.json).
+  //
+  // Value is a IIIF pct: region — { x, y, w, h } as percentages of the
+  // master image. Example: { x: 5, y: 3, w: 92, h: 94 } crops 5% off the
+  // left, 3% off the top, keeps a 92% × 94% window in the middle.
+  //
+  // The crop is applied *client-side* via OSD's tile-source `clip` rect,
+  // so the full deep-zoom pyramid stays in use — tiles outside the clip
+  // are simply never requested. Removing an entry instantly restores the
+  // uncropped view.
+  var GUID_CROP_PCT = {
+    // 'image-guid': { x: 0, y: 0, w: 100, h: 100 },
+  };
 
   // Suppress the browser's default blue focus ring on the OSD canvas.
   (function injectOsdFocusStyle() {
@@ -93,8 +116,8 @@
     var keys = Object.keys(window);
     for (var i = 0; i < keys.length; i++) {
       var name = keys[i];
-      // e.g. blattInfoIIIF_FrgZh, blattInfoIIIF_T  (skip the _T_onb alt)
-      if (/^blattInfoIIIF_[A-Za-z]+$/.test(name) && !/_onb$/i.test(name) &&
+      // e.g. blattInfoIIIF_FrgZh, blattInfoIIIF_T, blattInfoIIIF_WhFrg77  (skip the _T_onb alt)
+      if (/^blattInfoIIIF_[A-Za-z0-9]+$/.test(name) && !/_onb$/i.test(name) &&
           window[name] && typeof window[name] === 'object') {
         mappings.push({ name: name, map: window[name] });
       }
@@ -117,10 +140,12 @@
     return null;
   }
 
-  // A mapping value is either a bare GUID or an absolute info.json URL.
+  // A mapping value is a bare GUID, an absolute info.json URL, or a local
+  // image path (returned as an OSD simple-image tile source object).
   function mappingValueToInfoJson(value) {
     if (!value) return null;
     if (/^https?:\/\//i.test(value)) return value;
+    if (/\.(jpg|jpeg|png)$/i.test(value)) return { type: 'image', url: value };
     return IIIF_V3_BASE + value + '/info.json';
   }
 
@@ -133,6 +158,70 @@
     var key = pathToKey(v);
     var value = lookupMapping(key);
     return { infoUrl: value ? mappingValueToInfoJson(value) : null, key: key };
+  }
+
+  var NO_CROP = { x: 0, y: 0, w: 100, h: 100 };
+
+  function cropFor(source) {
+    if (typeof source !== 'string') return null;
+    var m = source.match(/\/([^\/]+)\/info\.json$/i);
+    return m ? GUID_CROP_PCT[m[1]] || null : null;
+  }
+
+  // Raw pixel size { width, height } of an info.json or a simple-image
+  // source, or null on failure. Cached: renderSpread runs on every page
+  // turn, but a master's dimensions never change.
+  var _dimsCache = {};
+  function fetchDims(source) {
+    if (!source) return Promise.resolve(null);
+    var url = typeof source === 'string' ? source : source.url;
+    if (_dimsCache[url] !== undefined) return Promise.resolve(_dimsCache[url]);
+    var p = typeof source === 'string'
+      ? fetch(url).then(function (r) { return r.ok ? r.json() : null; })
+      : new Promise(function (resolve) {
+          var img = new Image();
+          img.onload = function () { resolve({ width: img.naturalWidth, height: img.naturalHeight }); };
+          img.onerror = function () { resolve(null); };
+          img.src = url;
+        });
+    return p.then(function (d) {
+      var dims = d && d.width && d.height ? { width: d.width, height: d.height } : null;
+      _dimsCache[url] = dims;
+      return dims;
+    }).catch(function () {
+      _dimsCache[url] = null;
+      return null;
+    });
+  }
+
+  // OSD tile-source config placing one folio so that its VISIBLE (cropped)
+  // area spans y = 0..1 and starts at x = visibleX. OSD's `clip` only culls
+  // tiles outside the rect — it does not rescale or reposition the item,
+  // whose bounds still come from the full master — so the item is scaled
+  // to height 100/crop.h and shifted up/left by the cropped-off margins.
+  // Returns { config, visibleWidth } (visibleWidth in viewport units, what
+  // the next folio butts against). Without dims (fetch failed) the crop is
+  // skipped and the aspect ratio falls back to 1.
+  function placeFolio(source, dims, visibleX) {
+    var crop = (dims && cropFor(source)) || NO_CROP;
+    var ar = dims ? dims.width / dims.height : 1;
+    var itemH = 100 / crop.h;
+    var itemW = ar * itemH;
+    var config = {
+      tileSource: source,
+      x: visibleX - itemW * crop.x / 100,
+      y: -itemH * crop.y / 100,
+      height: itemH,
+    };
+    if (crop !== NO_CROP) {
+      config.clip = new OpenSeadragon.Rect(
+        dims.width * (crop.x / 100),
+        dims.height * (crop.y / 100),
+        dims.width * (crop.w / 100),
+        dims.height * (crop.h / 100)
+      );
+    }
+    return { config: config, visibleWidth: itemW * crop.w / 100 };
   }
 
   // --- error overlays ---------------------------------------------------
@@ -204,23 +293,25 @@
       return;
     }
 
-    // Side-by-side layout. Each folio is normalized to width = 1 in viewport
-    // units; the right folio is offset to x = 1 + SPREAD_GAP so the two sit
-    // next to each other with a small gutter. Using width=1 (rather than
-    // height=1) lets OSD's default home fit frame the whole spread correctly
-    // for a wide container — a height=1 layout collapses the fit and hides
-    // the second folio. OSD reads each image's true aspect ratio from its
-    // own info.json, so pages of differing proportions still align at the top.
-    var tileSources = [];
-    if (left.infoUrl) {
-      tileSources.push({ tileSource: left.infoUrl, x: 0, y: 0, width: 1 });
-    }
-    if (right.infoUrl) {
-      var rightX = left.infoUrl ? 1 + SPREAD_GAP : 0;
-      tileSources.push({ tileSource: right.infoUrl, x: rightX, y: 0, width: 1 });
-    }
+    // Layout is height-normalized (as in wellcome-schreiber): both folios'
+    // visible areas sit on the same top and bottom edge (viewport height = 1)
+    // and their widths follow each image's (cropped) aspect ratio — folios of
+    // the same height, possibly differing widths, like a physical bifolium.
+    // Needs each side's dimensions before OSD init, hence the fetch.
+    var seq = ++renderSeq;
+    Promise.all([fetchDims(left.infoUrl), fetchDims(right.infoUrl)]).then(function (dims) {
+      if (seq !== renderSeq) return;
+      var leftFolio = left.infoUrl ? placeFolio(left.infoUrl, dims[0], 0) : null;
+      var rightX = leftFolio ? leftFolio.visibleWidth + SPREAD_GAP : 0;
+      var rightFolio = right.infoUrl ? placeFolio(right.infoUrl, dims[1], rightX) : null;
+      var tileSources = [];
+      if (leftFolio) tileSources.push(leftFolio.config);
+      if (rightFolio) tileSources.push(rightFolio.config);
+      var spreadWidth = rightFolio ? rightX + rightFolio.visibleWidth : leftFolio.visibleWidth;
+      startViewer(tileSources, new OpenSeadragon.Rect(0, 0, spreadWidth, 1));
+    });
 
-    (function () {
+    function startViewer(tileSources, visibleBounds) {
       activeViewer = OpenSeadragon({
         element: containerEl,
         prefixUrl: 'https://cdn.jsdelivr.net/npm/openseadragon@4/build/openseadragon/images/',
@@ -237,13 +328,19 @@
         gestureSettingsTouch: { clickToZoom: false, dblClickToZoom: true },
         gestureSettingsPen: { clickToZoom: false, dblClickToZoom: true },
       });
-      // On the first render (e.g. right after DOMContentLoaded) OSD can open
-      // before the container has its final size, leaving a blank canvas until
-      // the next render. Re-home once open, after a frame, so the spread is
-      // framed against the settled container dimensions.
-      activeViewer.addHandler('open', function () {
+      // Home = the visible spread, not the items' full (uncropped) bounds,
+      // so cropped-off margins don't count when framing. On the first render
+      // (e.g. right after DOMContentLoaded) OSD can open before the container
+      // has its final size, leaving a blank canvas until the next render.
+      // Re-home once open, after a frame, so the spread is framed against
+      // the settled container dimensions.
+      // (Overrides this viewer's getHomeBounds — which goHome and the home
+      // button use — since Viewport.setHomeBounds is deprecated in OSD 4.)
+      var viewer = activeViewer;
+      viewer.viewport.getHomeBounds = function () { return visibleBounds.clone(); };
+      viewer.addHandler('open', function () {
         requestAnimationFrame(function () {
-          if (activeViewer && activeViewer.viewport) activeViewer.viewport.goHome(true);
+          if (viewer.viewport) viewer.viewport.goHome(true);
         });
       });
 
@@ -259,7 +356,7 @@
         }
         console.warn('[osdViewer] tile-load-failed', evt);
       });
-    })();
+    }
 
     // Flag a genuine mapping miss (not a designed blank) per side.
     if (!left.infoUrl && !leftBlank) {
@@ -290,9 +387,10 @@
   }, true);
 
   // Hide the "Buch wählen" section select when the manuscript defines no
-  // sections (only the placeholder option). FrgZh and BSB have no Abschnitte;
-  // ONB does, so its select stays. Hides just the #dropdown so the concordance
-  // (#versAnzeige) below it in the same group still shows.
+  // sections (only the placeholder option). FrgZh, BSB and WhFrg77 have no
+  // Abschnitte; ONB does, so its select stays. Uses visibility (not display)
+  // so #dropdown keeps its slot and the header layout matches ONB: the
+  // concordance (#versAnzeige) stays on the second row.
   function hideEmptyBookSelect() {
     var menu = document.getElementById('buchMenu');
     if (!menu) return;
@@ -302,7 +400,7 @@
     }
     if (real === 0) {
       var dd = document.getElementById('dropdown');
-      if (dd) dd.style.display = 'none';
+      if (dd) dd.style.visibility = 'hidden';
     }
   }
   if (document.readyState === 'loading') {

@@ -77,6 +77,29 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("submitBlattImg").addEventListener("click", function () {
         checkSeitenEingabe();
     });
+    document.getElementById("vers").addEventListener("mouseover", function () {
+        Tip('Vers finden');
+    });
+
+    document.getElementById("vers").addEventListener("mouseout", function () {
+        UnTip();
+    });
+
+    document.getElementById("versInput").addEventListener("keypress", function (event) {
+        return submitenter(this, event);
+    });
+
+    document.getElementById("submitVersImg").addEventListener("mouseover", function () {
+        Tip('Vers finden');
+    });
+
+    document.getElementById("submitVersImg").addEventListener("mouseout", function () {
+        UnTip();
+    });
+
+    document.getElementById("submitVersImg").addEventListener("click", function () {
+        checkVersEingabe();
+    });
     document.getElementById("handschrift").addEventListener("mouseover", function () {
         Tip('Handschrift wählen');
     });
@@ -349,6 +372,10 @@ function submitenter(myfield, e) {
             checkSeitenEingabe();
             if (e.preventDefault) e.preventDefault();
             return false;
+        } else if (myfield.name == "Vers") {
+            checkVersEingabe();
+            if (e.preventDefault) e.preventDefault();
+            return false;
         }
     }
     return true;
@@ -368,6 +395,24 @@ function checkSeitenEingabe() {
             bildAnzeigeESNeu();
         }
     }
+}
+
+// get the value of the vers input and navigate to the double page containing it
+// (verse parsing in ../versSuche.js)
+function checkVersEingabe() {
+    const versEingabe = document.naviHSR.Vers.value.trim();
+    if (!versEingabe) {
+        return;
+    }
+    const slide = findVersSlide(blattInfoData.blattInfo, versEingabe);
+    if (slide === null) {
+        alert("Vers " + versEingabe + " ist in diesem Fragment nicht überliefert.");
+        return;
+    }
+    dpSlide = slide;
+    bildAnzeigeDSNeu();
+    resetCurrentSlide();
+    document.naviHSR.Vers.value = "";
 }
 
 //Menu Abschnitte wählen

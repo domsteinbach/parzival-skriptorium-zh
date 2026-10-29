@@ -13,6 +13,7 @@
 	<script src="blattInfoFrgZh.js" type="text/javascript"></script>
 	<script src="blattInfoIIIF_FrgZh.js" type="text/javascript"></script>
 	<script src="../osdViewer.js" type="text/javascript"></script>
+	<script src="../versSuche.js" type="text/javascript"></script>
 
 	<link rel="stylesheet" type="text/css" href="css/RStylesFrgZh.css">
 </head>
@@ -37,7 +38,7 @@
 	<div id="navigation">
 		<form name="naviHSR">
 			<div class="hdr-book">
-				<div id="dropdown"> <!-- ausgeblendet via CSS falls leer -->
+				<div id="dropdown"> <!-- unsichtbar falls leer (osdViewer.js), der Platz bleibt -->
 					<select name="selectBook" id="buchMenu" class="Auswahl">
 						<option value="javascript:">Buch w&auml;hlen</option>
 					</select>
@@ -65,14 +66,23 @@
 				<div id="blattAnzeige" class="dynamisch"></div>
 			</div>
 
+			<div class="hdr-vers">
+				<div class="hdr-vers-input">
+					<div class="navText" id="lbl_vers">Vers</div>
+					<div id="vers">
+						<input type="text" name="Vers" maxlength="6" class="Feld" id="versInput" />
+					</div>
+					<div id="submitVers">
+						<img border="0" src="../images/submitSuchen.gif" alt="Vers finden" id="submitVersImg" />
+					</div>
+				</div>
+				<div id="schreibAnzeige" class="dynamisch"></div>
+			</div>
+
 			<div class="hdr-lage">
 				<div id="lagensymbol"><img name="ImgLagensymbol" src="../Lagensymbole/Doppelseite/blind.gif"
 						alt="Lagensymbol" /></div>
 				<div id="lagenAnzeige" class="dynamisch"></div>
-			</div>
-
-			<div class="hdr-book">
-				<div id="schreibAnzeige" class="dynamisch"></div>
 			</div>
 
 			<div id="handschrift">
@@ -84,6 +94,8 @@
 						Parzival</option>
 					<option value="../BSB_Cgm63/cgm63.html">Rudolf von Ems, Wilhelm von Orlens, Handschrift
 						M&uuml;nchen, Bayerische Staatsbibliothek, Cgm 63</option>
+					<option value="../WhFrg77/whfrg77.html">Willehalm-Fragment 77, Budapest, Bibl. der Ungar. Akademie der
+						Wissenschaften, Fragm. K. 554, Berlin, Geh. Staatsarchiv Preu&szlig;. Kulturbesitz, Bibliothek 60,96</option>
 				</select>
 			</div>
 		</form>

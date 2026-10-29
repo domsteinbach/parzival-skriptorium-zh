@@ -1,0 +1,136 @@
+{
+  "blattInfo": [
+    {
+      "dpSlide": 0,
+      "blatt": "1r",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_01r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "413.30–414.9, 415.2–415.9",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_1_1r"
+    },
+    {
+      "dpSlide": 1,
+      "blatt": "1v",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_01v02r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "416.3–11, 417.4–13, 418.7–14, 419.9–16",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_1_1v"
+    },
+    {
+      "dpSlide": 1,
+      "blatt": "2r",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_01v02r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "416.3–11, 417.4–13, 418.7–14, 419.9–16",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_2r"
+    },
+    {
+      "dpSlide": 2,
+      "blatt": "2v",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_02v03r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "420.10–18, 421.12–20, 422.2–9, 423.4–11",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_2v"
+    },
+    {
+      "dpSlide": 2,
+      "blatt": "3r",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_02v03r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "420.10–18, 421.12–20, 422.2–9, 423.4–11",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_3r"
+    },
+    {
+      "dpSlide": 3,
+      "blatt": "3v",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_04v05r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "424.6–13, 425.8–15, 434.26–435.3, 435.29b–436.5",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_3v_6r"
+    },
+    {
+      "dpSlide": 3,
+      "blatt": "6r",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_04v05r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "424.6–13, 425.8–15, 434.26–435.3, 435.29b–436.5",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_3v_6r"
+    },
+    {
+      "dpSlide": 4,
+      "blatt": "6v",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_06v07r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "436.30–437.8, 438.1–10, 439.17–24, 440.19–26",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_6v"
+    },
+    {
+      "dpSlide": 4,
+      "blatt": "7r",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_06v07r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "436.30–437.8, 438.1–10, 439.17–24, 440.19–26",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_7r"
+    },
+    {
+      "dpSlide": 5,
+      "blatt": "7v",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_07v08r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "441.22–29, 442.23–30, 443.24–444.3, 444.26–445.5",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_2_7v"
+    },
+    {
+      "dpSlide": 5,
+      "blatt": "8r",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_07v08r",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "441.22–29, 442.23–30, 443.24–444.3, 444.26–445.5",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_1_8r"
+    },
+    {
+      "dpSlide": 6,
+      "blatt": "8v",
+      "lagenNr": "",
+      "dpLagenSymb": "L4_FrgZhWh_08v",
+      "dpLagenName": "Quaternio (?)",
+      "dpKonkordanz": "445.29–446.8, 446.30–447.9",
+      "schreiber": "Schreiber 1",
+      "aktBuch": 0,
+      "img": "WhFrg77_1_8v"
+    }
+  ]
+}

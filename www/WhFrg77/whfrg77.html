@@ -1,0 +1,104 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<title>Zürcher Parzival-Skriptorium</title>
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+	<script src="https://cdn.jsdelivr.net/npm/openseadragon@4/build/openseadragon/openseadragon.min.js"></script>
+	<script src="RScripts_konvWhFrg77.js" type="text/javascript"></script>
+	<script src="blattInfoIIIF_WhFrg77.js" type="text/javascript"></script>
+	<script src="../osdViewer.js" type="text/javascript"></script>
+	<script src="../versSuche.js" type="text/javascript"></script>
+
+	<link rel="stylesheet" type="text/css" href="css/RStylesWhFrg77.css">
+</head>
+
+
+<body bgcolor="F0F0F0">
+	<div class="header-container">
+		<div id="startseite-icon-button">
+			<a href="../index.html" aria-label="Zur Startseite">
+				<svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+					stroke="currentColor" class="size-6">
+					<path stroke-linecap="round" stroke-linejoin="round"
+						d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+				</svg>
+			</a>
+		</div>
+		<div class="titel" id="bezeichnung"><b>Willehalm-Fragment 77, Budapest, Bibl. der Ungar. Akademie der
+				Wissenschaften, Fragm. K. 554, Berlin, Geh. Staatsarchiv Preu&szlig;. Kulturbesitz, Bibliothek
+				60,96</b> (Projekt: Das Zürcher Parzival-Skriptorium)
+		</div>
+	</div>
+	<div id="navigation">
+		<form name="naviHSR">
+			<div class="hdr-book">
+				<div id="dropdown"> <!-- unsichtbar falls leer (osdViewer.js), der Platz bleibt -->
+					<select name="selectBook" id="buchMenu" class="Auswahl">
+						<option value="javascript:">Buch w&auml;hlen</option>
+					</select>
+				</div>
+				<div id="versAnzeige" class="dynamisch"></div>
+			</div>
+
+			<div class="hdr-arrows">
+				<div id="blaettern1"><img border="0" src="../images/backward_book.gif"></div>
+				<div id="blaettern2"><img border="0" src="../images/backward_page.gif"></div>
+				<div id="blaettern3"><img border="0" src="../images/forward_page.gif"></div>
+				<div id="blaettern4"><img border="0" src="../images/forward_book.gif"></div>
+			</div>
+
+			<div class="hdr-blatt">
+				<div class="hdr-blatt-input">
+					<div class="navText" id="lbl_blatt">Blatt</div>
+					<div id="blatt">
+						<input type="text" name="Blatt" maxlength="6" class="Feld" id="blattInput" />
+					</div>
+					<div id="submitBlatt">
+						<img border="0" src="../images/submitSuchen.gif" alt="Blatt finden" id="submitBlattImg" />
+					</div>
+				</div>
+				<div id="blattAnzeige" class="dynamisch"></div>
+			</div>
+
+			<div class="hdr-vers">
+				<div class="hdr-vers-input">
+					<div class="navText" id="lbl_vers">Vers</div>
+					<div id="vers">
+						<input type="text" name="Vers" maxlength="6" class="Feld" id="versInput" />
+					</div>
+					<div id="submitVers">
+						<img border="0" src="../images/submitSuchen.gif" alt="Vers finden" id="submitVersImg" />
+					</div>
+				</div>
+				<div id="schreibAnzeige" class="dynamisch"></div>
+			</div>
+
+			<div class="hdr-lage">
+				<div id="lagensymbol"><img name="ImgLagensymbol" src="../Lagensymbole/Doppelseite/blind.gif"
+						alt="Lagensymbol" /></div>
+				<div id="lagenAnzeige" class="dynamisch"></div>
+			</div>
+
+			<div id="handschrift">
+				<select name="selectHand" id="handMenu" class="Auswahl">
+					<option value="javascript:">Handschriften Z&uuml;rcher Skriptorium</option>
+					<option value="../ONB_Cod2708/cod2708.html">Parzival-Handschrift Wien, &Ouml;sterreichische
+						Nationalbibliothek, Cod. 2708 (Hs. T)</option>
+					<option value="../FrgZh/frgzhtrpz.html">Fragmente Z&uuml;rich: Tristan (z/z<sup>1</sup>) und
+						Parzival</option>
+					<option value="../BSB_Cgm63/cgm63.html">Rudolf von Ems, Wilhelm von Orlens, Handschrift
+						M&uuml;nchen, Bayerische Staatsbibliothek, Cgm 63</option>
+					<option value="../WhFrg77/whfrg77.html">Willehalm-Fragment 77, Budapest, Bibl. der Ungar. Akademie der
+						Wissenschaften, Fragm. K. 554, Berlin, Geh. Staatsarchiv Preu&szlig;. Kulturbesitz, Bibliothek 60,96</option>
+				</select>
+			</div>
+		</form>
+	</div>
+	<div id="osdSpread"></div>
+</body>
+
+</html>

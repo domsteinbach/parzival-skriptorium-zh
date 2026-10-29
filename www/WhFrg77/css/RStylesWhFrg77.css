@@ -1,0 +1,189 @@
+@charset "utf-8";
+
+/* Ported from the wellcome-schreiber viewer template: a flex-column page
+   (header rows fixed, #osdSpread fills the rest) replacing the legacy
+   absolute-positioned layout. Zoom buttons are gone (OSD zooms continuously). */
+
+/* ---------------------- reset + page frame ---------------------- */
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
+html, body {
+    margin: 0;
+    padding: 0.4em;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #F0F0F0;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+p  { margin-top: 5px; margin-bottom: 15px; }
+h1 { font-size: 14px; font-weight: bold; margin-top: 50px; }
+h2 { font-size: 13px; font-weight: normal; padding-top: 5px; padding-left: 15px; }
+a:link, a:visited, a:active, a:focus { color: #000000; font-weight: bold; text-decoration: none; }
+a:hover  { color: #8B1B31; font-weight: bold; text-decoration: none; }
+
+/* ---------------------- header row 1: home + title ---------------------- */
+.header-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+    flex: 0 0 auto;
+    margin-top: 0.5em;
+    margin-bottom: 0.75em;
+}
+
+#startseite-icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0.15em;
+    border: 1pt solid #8B1B31;
+    border-radius: 0.4em;
+    width: 1.5em;
+    height: 1.5em;
+    transition: background-color 0.2s ease;
+    box-shadow: 0.15em 0.15em 0.3em rgba(0, 0, 0, 0.2);
+    flex: 0 0 auto;
+}
+#startseite-icon-button:hover { background-color: #f5e9eb; }
+.icon { width: 1em; height: 1em; color: #8B1B31; }
+
+#bezeichnung { z-index: 1; }
+
+/* ---------------------- header row 2: navigation ----------------------
+   Single flex row of groups (left-to-right):
+     .hdr-book    — buchMenu (top) / versAnzeige (bottom)
+     .hdr-arrows  — the 4 blaettern arrows in one inline row
+     .hdr-blatt   — Blatt label + input + submit (top) / blattAnzeige (bottom)
+     .hdr-vers    — Vers label + input + submit (optional, ONB/BSB)
+     .hdr-lage    — lagensymbol (top, larger) / lagenAnzeige (bottom)
+     #handschrift — manuscript switcher
+*/
+#navigation {
+    flex: 0 0 auto;
+    margin-bottom: 0.75em;
+}
+
+form[name="naviHSR"] {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 1.5em;
+    margin: 0;
+}
+
+.hdr-book, .hdr-blatt, .hdr-vers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.25em;
+}
+
+.hdr-lage {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25em;
+}
+
+.hdr-arrows {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5em;
+}
+
+.hdr-blatt-input, .hdr-vers-input {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5em;
+}
+
+#dropdown, #blatt, #submitBlatt, #vers, #submitVers, #handschrift { display: inline-flex; align-items: flex-start; }
+#lbl_blatt, #lbl_vers { display: inline-block; }
+#blattInput, #versInput { width: 4em; }
+/* Fixed, wider width so long option labels are clipped (ellipsis) in the
+   closed select instead of stretching or overflowing the header. */
+#handMenu    { width: 22em; max-width: 22em; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+/* Match select's internal text-left padding so versAnzeige lines up
+   with the option text visible in #buchMenu. */
+#versAnzeige { padding-left: 0.5em; }
+
+#blaettern1, #blaettern2, #blaettern3, #blaettern4 {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+#blaettern1 img, #blaettern2 img, #blaettern3 img, #blaettern4 img { display: block; }
+
+#versAnzeige, #blattAnzeige, #lagenAnzeige, #schreibAnzeige {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    white-space: nowrap;
+    /* Always reserve two lines, so a wrapped verse/Lage text never changes
+       the header height (and the viewer below doesn't jump). */
+    line-height: 1.25em;
+    min-height: 2.5em;
+}
+
+/* Fixed widths for the two variable-length texts, so the controls to their
+   right stay put across pages and manuscripts; longer text wraps instead
+   (e.g. the four Willehalm verse ranges). */
+#versAnzeige  { width: 18em; white-space: normal; }
+#lagenAnzeige { width: 15em; white-space: normal; }
+/* Bl. and Schreiber take the width of the input row above them without
+   widening it (width 0 + min-width 100%); longer text such as BSB's
+   "Einband hinten außen" wraps. */
+#blattAnzeige, #schreibAnzeige { width: 0; min-width: 100%; white-space: normal; }
+
+#lagensymbol {
+    display: block;
+    width: 128px;
+    height: 39px;
+}
+#lagensymbol img {
+    display: block;
+    width: 128px;
+    height: 39px;
+}
+
+/* ---------------------- OSD stage ---------------------- */
+#osdSpread {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: #F0F0F0;
+}
+#osdSpread .openseadragon-canvas,
+#osdSpread canvas { cursor: grab; }
+#osdSpread .openseadragon-canvas:active,
+#osdSpread canvas:active { cursor: grabbing; }
+
+/* ---------------------- tooltips ---------------------- */
+.tooltip {
+    position: absolute;
+    z-index: 9999;
+    background-color: #EEE4C6;
+    color: #000000;
+    padding: 3px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+    border: black solid 1px;
+    pointer-events: none;
+}
+
+/* ---------------------- text helpers ---------------------- */
+.navText, .navTextLink { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; text-decoration: none; margin: 0; }
+.red        { color: #8B1B31; }
+.dynamisch  { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; }
+.titel      { font-family: Arial, Helvetica, sans-serif; font-size: 12pt; color: #8B1B31; }
+.fliesstext { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; margin-bottom: 10px; margin-right: 20px; padding-left: 15px; }
